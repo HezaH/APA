@@ -389,7 +389,7 @@ class Grafo:
             v_proximo = melhor_caminho[i + 1]
             peso = grafo[v_atual][v_proximo]
             caminho_str += f"{v_atual}: {peso} -> "
-        caminho_str += f"{melhor_caminho[-1]} -> {melhor_caminho[0]}"
+        caminho_str += f"{melhor_caminho[-1]}"
         
         print(f"Caminho CHD: {caminho_str}")
         return melhor_caminho, menor_custo
@@ -541,7 +541,7 @@ def create_graph():
     times_ch_dp = []
     times_tsp = []
     times_tsp_dp = []
-
+    tempo_total1, tempo_total2, tempo_total3, tempo_total4 = 0, 0, 0, 0
     i = 5
     while i > 0:
         num_vertices = i
@@ -553,45 +553,62 @@ def create_graph():
         generate_graph_with_edges(grafo, num_vertices, especifico_grafo = grafo.grafo_ch)
         grafo.transformar_em_tsp()
         g_list = list(grafo.grafo_ch.keys())
-        print("-------------------------------------------------")
-        try:
-            caminho_ch, tempo_total = medir_tempo_uso(grafo.caminho_hamiltoniano, g_list[0], grafo.grafo_ch)
-            times_ch.append([tempo_total, num_vertices])
-            val1 = True
-        except:
-            times_ch.append([])
+        
+        if tempo_total1 < 180:
+            print("-------------------------------------------------")
+            try:
+                caminho_ch, tempo_total1 = medir_tempo_uso(grafo.caminho_hamiltoniano, g_list[0], grafo.grafo_ch)
+                times_ch.append([tempo_total1, num_vertices])
+                val1 = True
+            except:
+                times_ch.append([])
+                val1 = False
+        else:
+            times_ch.append([None, num_vertices])
             val1 = False
 
-        print("-------------------------------------------------")
-        try:
-            caminho_tsp, tempo_total = medir_tempo_uso(grafo.calcular_tsp_forcando_ch, g_list[0], grafo.grafo_tsp, caminho_ch[0])
-            times_tsp.append([tempo_total, num_vertices])
-            val2 = True
-        except:
-            times_tsp.append([])
+        if tempo_total2 < 180:
+            print("-------------------------------------------------")
+            try:
+                caminho_tsp, tempo_total2 = medir_tempo_uso(grafo.calcular_tsp_forcando_ch, g_list[0], grafo.grafo_tsp, caminho_ch[0])
+                times_tsp.append([tempo_total2, num_vertices])
+                val2 = True
+            except:
+                times_tsp.append([None, num_vertices])
+                val2 = False
+        else:
+            times_tsp.append([None, num_vertices])
             val2 = False
 
-        print("-------------------------------------------------")
-        try:
-            caminho_ch_dp, tempo_total = medir_tempo_uso(grafo.caminho_hamiltoniano_dp, g_list[0], grafo.grafo_ch)
-            times_ch_dp.append([tempo_total, num_vertices])
-            val3 = True
-        except:
-            times_ch_dp.append([])
+        if tempo_total3 < 180:
+            print("-------------------------------------------------")
+            try:
+                caminho_ch_dp, tempo_total3 = medir_tempo_uso(grafo.caminho_hamiltoniano_dp, g_list[0], grafo.grafo_ch)
+                times_ch_dp.append([tempo_total3, num_vertices])
+                val3 = True
+            except:
+                times_ch_dp.append([None, num_vertices])
+                val3 = False
+        else:
+            times_ch_dp.append([None, num_vertices])
             val3 = False
-
-        print("-------------------------------------------------")
-        try:
-            caminho_tsp, tempo_total = medir_tempo_uso(grafo.held_karp, grafo.grafo_tsp, caminho_ch_dp[0])
-            times_tsp_dp.append([tempo_total, num_vertices])
-            val4 = True
-        except:
-            times_tsp_dp.append([])
+        
+        if tempo_total4 < 180:
+            print("-------------------------------------------------")
+            try:
+                caminho_tsp, tempo_total4 = medir_tempo_uso(grafo.held_karp, grafo.grafo_tsp, caminho_ch_dp[0])
+                times_tsp_dp.append([tempo_total4, num_vertices])
+                val4 = True
+            except:
+                times_tsp_dp.append([None, num_vertices])
+                val4 = False
+            print("-------------------------------------------------")
+        else:
+            times_tsp_dp.append([None, num_vertices])
             val4 = False
         i+=1
-        if not all([val1, val2, val3, val4]):
+        if not val1 and not val2 and not val3 and not val4:
             break
-        
         
     # Separar os valores de tamanho e tempo para as quatro listas
     y_ch, x_ch = zip(*times_ch)
