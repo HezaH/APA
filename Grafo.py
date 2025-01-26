@@ -524,7 +524,7 @@ def medir_tempo_uso(func, *args):
 
 def generate_graph_with_edges(grafo, num_vertices, especifico_grafo):
     grafo.gerar_automaticamente_arestas(num_vertices=num_vertices, grafo = especifico_grafo)
-
+    # grafo = grafo
     # # Gerando a matriz de adjacência
     # matriz_adjacencia = grafo.gerar_matriz_adjacencia(especifico_grafo) #!
     # print("\nMatriz de Adjacência:")
@@ -542,19 +542,18 @@ def create_graph():
     times_tsp = []
     times_tsp_dp = []
     tempo_total1, tempo_total2, tempo_total3, tempo_total4 = 0, 0, 0, 0
+    limite = 180
     i = 5
     while i > 0:
         num_vertices = i
         # Generate a graph of the given length
         grafo = Grafo()
-        if i == 6:
-            i = i 
         # Adicionando arestas com pesos (distâncias)
         generate_graph_with_edges(grafo, num_vertices, especifico_grafo = grafo.grafo_ch)
         grafo.transformar_em_tsp()
         g_list = list(grafo.grafo_ch.keys())
         
-        if tempo_total1 < 180:
+        if tempo_total1 < limite:
             print("-------------------------------------------------")
             try:
                 caminho_ch, tempo_total1 = medir_tempo_uso(grafo.caminho_hamiltoniano, g_list[0], grafo.grafo_ch)
@@ -567,7 +566,7 @@ def create_graph():
             times_ch.append([None, num_vertices])
             val1 = False
 
-        if tempo_total2 < 180:
+        if tempo_total2 < limite:
             print("-------------------------------------------------")
             try:
                 caminho_tsp, tempo_total2 = medir_tempo_uso(grafo.calcular_tsp_forcando_ch, g_list[0], grafo.grafo_tsp, caminho_ch[0])
@@ -580,7 +579,7 @@ def create_graph():
             times_tsp.append([None, num_vertices])
             val2 = False
 
-        if tempo_total3 < 180:
+        if tempo_total3 < limite:
             print("-------------------------------------------------")
             try:
                 caminho_ch_dp, tempo_total3 = medir_tempo_uso(grafo.caminho_hamiltoniano_dp, g_list[0], grafo.grafo_ch)
@@ -593,7 +592,7 @@ def create_graph():
             times_ch_dp.append([None, num_vertices])
             val3 = False
         
-        if tempo_total4 < 180:
+        if tempo_total4 < limite:
             print("-------------------------------------------------")
             try:
                 caminho_tsp, tempo_total4 = medir_tempo_uso(grafo.held_karp, grafo.grafo_tsp, caminho_ch_dp[0])
@@ -612,24 +611,39 @@ def create_graph():
         
     # Separar os valores de tamanho e tempo para as quatro listas
     y_ch, x_ch = zip(*times_ch)
-    y_tsp, x_tsp, = zip(*times_tsp)
-    y_ch_dp, x_ch_dp  = zip(*times_ch_dp)
-    y_tsp_dp, x_tsp_dp  = zip(*times_tsp_dp)
+    y_tsp, x_tsp = zip(*times_tsp)
+    y_ch_dp, x_ch_dp = zip(*times_ch_dp)
+    y_tsp_dp, x_tsp_dp = zip(*times_tsp_dp)
 
-    # Criar o gráfico
-    plt.figure(figsize=(10, 6))
+    # Criar subplots
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 12))
 
-    plt.plot(x_ch, y_ch, label='CH - FB', marker='o')
-    plt.plot(x_tsp, y_tsp, label='TSP - FB', marker='o')
-    plt.plot(x_ch_dp, y_ch_dp, label='CH - PD', marker='o')
-    plt.plot(x_tsp_dp, y_tsp_dp, label='TSP - PD', marker='o')
+    # Primeiro subplot - gráfico completo
+    ax1.plot(x_ch, y_ch, label='CH - FB', marker='o')
+    ax1.plot(x_tsp, y_tsp, label='TSP - FB', marker='o')
+    ax1.plot(x_ch_dp, y_ch_dp, label='CH - PD', marker='o')
+    ax1.plot(x_tsp_dp, y_tsp_dp, label='TSP - PD', marker='o')
 
-    plt.xlabel('Tamanho da entrada (n)')
-    plt.ylabel('Tempo (segundos)')
-    plt.title('Tempo de Execução de Diferentes Algoritmos')
-    plt.legend()
-    plt.grid(True)
+    ax1.set_xlabel('Tamanho da entrada (n)')
+    ax1.set_ylabel('Tempo (segundos)')
+    ax1.set_title('Tempo de Execução de Diferentes Algoritmos - Completo')
+    ax1.legend()
+    ax1.grid(True)
 
+    # Segundo subplot - focado na região de n = 11 até 14
+    ax2.plot(x_ch, y_ch, label='CH - FB', marker='o')
+    ax2.plot(x_tsp, y_tsp, label='TSP - FB', marker='o')
+    ax2.plot(x_ch_dp, y_ch_dp, label='CH - PD', marker='o')
+    ax2.plot(x_tsp_dp, y_tsp_dp, label='TSP - PD', marker='o')
+
+    ax2.set_xlabel('Tamanho da entrada (n)')
+    ax2.set_ylabel('Tempo (segundos)')
+    ax2.set_title('Tempo de Execução de Diferentes Algoritmos - Focado em n=11 até n=14')
+    ax2.legend()
+    ax2.grid(True)
+    ax2.set_xlim(11, 14)
+
+    plt.tight_layout()
     plt.show()
 
 
